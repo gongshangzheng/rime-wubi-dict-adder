@@ -1,0 +1,11 @@
+[project]
+name = "wubicodegenerator"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "ipython>=8.31.0",
+    "pywubi>=0.0.2",
+    "wubi>=1.0",
+]
