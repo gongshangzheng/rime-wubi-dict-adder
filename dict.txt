@@ -1,0 +1,2 @@
+# Dictionary format:
+# {chinese_characters}\t{wubi_code}
