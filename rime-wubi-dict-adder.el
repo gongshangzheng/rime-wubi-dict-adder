@@ -270,6 +270,13 @@
 
 ;;;; Full audit
 
+(defcustom rime-wubi-dict-adder-check-report-shorter nil
+  "Whether the audit reports codes that are a strict prefix of pywubi's code.
+Rime matches by prefix, so three-letter shorthand is legitimate; these findings
+are therefore hidden by default.  Set to t when hunting for a dropped fourth
+letter."
+  :type 'boolean)
+
 (defconst rime-wubi-dict-adder--check-severity
   '(("format" . error)
     ("invalid-code" . error)
@@ -282,7 +289,10 @@
 
 (defun rime-wubi-dict-adder--check-fetch ()
   "Run the full dictionary audit and return the parsed JSON."
-  (let* ((result (rime-wubi-dict-adder--call (list "--check")))
+  (let* ((result (rime-wubi-dict-adder--call
+                  (append (list "--check")
+                          (when rime-wubi-dict-adder-check-report-shorter
+                            (list "--report-shorter")))))
          (status (car result))
          (output (cdr result)))
     (or (rime-wubi-dict-adder--parse-json output)

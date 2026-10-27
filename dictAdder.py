@@ -123,8 +123,12 @@ ERROR_STATUSES = {"format", "invalid-code", "invalid-weight", "duplicate", "mism
 # abbreviation (Rime accepts prefixes) and rare glyphs cannot be coded by pywubi.
 
 
-def check_dict(dict_file: str) -> dict:
-    """Audit DICT_FILE and return a summary plus findings."""
+def check_dict(dict_file: str, report_shorter: bool = False) -> dict:
+    """Audit DICT_FILE and return a summary plus findings.
+
+    Codes that are a strict prefix of pywubi's result are legitimate shorthand
+    for Rime (it matches by prefix), so they are only reported on request.
+    """
     findings: list[dict] = []
     seen: dict[str, int] = {}
     lines_seen = 0
@@ -188,8 +192,9 @@ def check_dict(dict_file: str) -> dict:
         if computed is None:
             report(lineno, word, code, "unverifiable", reason or "pywubi cannot code it")
         elif computed != code and computed.startswith(code):
-            report(lineno, word, code, "shorter",
-                   f"shorter than pywubi's {computed}", suggested=computed)
+            if report_shorter:
+                report(lineno, word, code, "shorter",
+                       f"shorter than pywubi's {computed}", suggested=computed)
         elif computed != code:
             report(lineno, word, code, "mismatch",
                    f"stored {code} but pywubi says {computed}", suggested=computed)
@@ -208,13 +213,16 @@ def main(argv: list[str]) -> int:
     parser.add_argument("-d", "--dict", required=True, help="path to the RIME dictionary")
     parser.add_argument("--check", action="store_true",
                         help="audit the whole dictionary instead of adding words")
+    parser.add_argument("--report-shorter", action="store_true",
+                        help="also report codes that are a prefix of pywubi's code "
+                             "(legitimate shorthand for Rime, off by default)")
     args = parser.parse_args(argv)
 
     dict_file = os.path.expanduser(args.dict)
 
     if args.check:
         try:
-            result = check_dict(dict_file)
+            result = check_dict(dict_file, report_shorter=args.report_shorter)
         except Exception as exc:  # noqa: BLE001
             print(json.dumps({"summary": {"lines": 0, "entries": 0, "errors": 1, "warnings": 0},
                               "findings": [{"line": 0, "word": "", "code": "",

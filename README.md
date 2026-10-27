@@ -55,7 +55,7 @@ uv sync          # 生成/更新 .venv 与 uv.lock
 | `invalid-weight` | ERROR | 第三列（权重）不是数字 |
 | `duplicate` | ERROR | 同一个词出现多次 |
 | `mismatch` | ERROR | 与 pywubi 计算值不一致 |
-| `shorter` | warn | 是 pywubi 计算值的前缀（可能是有意简写） |
+| `shorter` | warn（**默认不显示**） | 是 pywubi 计算值的前缀。Rime 按前缀匹配，三码简写是有意的，故默认静音；`(setq rime-wubi-dict-adder-check-report-shorter t)` 或 `--report-shorter` 可打开 |
 | `unverifiable` | warn | pywubi 无法为此词算出码（生僻字等） |
 
 `z` 开头的码属于 Rime 的符号命名空间（如 `·⇥za`、`->⇥zr`），不做内容校验。
